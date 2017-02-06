@@ -1,4 +1,4 @@
-function [sys,x0,str,ts] = MyControl(t,x,u,flag,xi,r1,r2,delta,gradoutside,doutside,x1t,x2t)
+function [sys,x0,str,ts] = MyControl(t,x,u,flag,xi,r1,r2,num_obs,delta,gradoutside,doutside,x1t,x2t)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Matlab M-file                Author: Ricardo Sanfelice
 %
@@ -22,7 +22,7 @@ switch flag,
     case 1 
         sys = mdlDerivatives(t,x,u);  % Calculate derivatives 
     case 3 
-        sys = mdlOutputs(t,x,u,r1,r2,delta,gradoutside,doutside,x1t,x2t); % Calculate outputs 
+        sys = mdlOutputs(t,x,u,r1,r2,num_obs,delta,gradoutside,doutside,x1t,x2t); % Calculate outputs 
     case { 2, 4, 9 } % Unused flags 
         sys = []; 
     otherwise 
@@ -69,32 +69,39 @@ sys = xdot;
 %============================================================== 
 % mdlOutputs % Return the block outputs. 
 %============================================================== % 
-function sys = mdlOutputs(t,x,u,r1,r2,delta,gradoutside,doutside,x1t,x2t)
+function sys = mdlOutputs(t,x,u,r1,r2,num_obs,delta,gradoutside,doutside,x1t,x2t)
 % parameters and variables
 x1 = u(1);
 x2 = u(2);
 
 % compute distance
-d = Distance([x1,x2],r1,r2,delta,doutside);
+d = Distance([x1,x2],r1,r2,num_obs,delta,doutside);
 
 % compute partial d1 / partial x1 and partial d1 / partial x2
-
-if (x1-r1)^2+(x2-r2)^2> delta^2/8
-  gradDx1 = (x1-r1)/sqrt((x1-r1)^2+(x2-r2)^2);
-  gradDx2 = (x2-r2)/sqrt((x1-r1)^2+(x2-r2)^2);
-else 
-    gradDx1 = gradoutside;
-    gradDx2 = gradoutside;
+gradDx1 = 0;
+gradDx2 = 0;
+for i = 1:num_obs
+    if (x1-r1(i))^2+(x2-r2(i))^2> delta^2/8
+        gradDx1 = gradDx1 + (x1-r1(i))/sqrt((x1-r1(i))^2+(x2-r2(i))^2);
+        gradDx2 = gradDx2 + (x2-r2(i))/sqrt((x1-r1(i))^2+(x2-r2(i))^2);
+    else 
+        gradDx1 = gradoutside;
+        gradDx2 = gradoutside;
+    end
 end
 
-   % compute gradient of V1 respect to x1 and x2
+% compute gradient of V1 respect to x1 and x2
 
-if (d <= 1) && (d>0)
-     gradVx1 = 10*(x1 - x1t) + 2*(d-1)*gradDx1*log(1/d)-(d-1)^2 * gradDx1 / d;
-     gradVx2 = 10*(x2 - x2t) + 2*(d-1)*gradDx2*log(1/d)-(d-1)^2 * gradDx2 / d;
-else
-     gradVx1 = 10*(x1-x1t);
-     gradVx2 = 10*(x2-x2t); 
+gradVx1 = 0;
+gradVx2 = 0;
+for i = 1:num_obs
+    if (d(i) <= 1) && (d(i)>0)
+        gradVx1 = gradVx1 + 10*(x1 - x1t) + 2*(d(i)-1)*gradDx1*log(1/d(i))-(d(i)-1)^2 * gradDx1 / d(i);
+        gradVx2 = gradVx2 + 10*(x2 - x2t) + 2*(d(i)-1)*gradDx2*log(1/d(i))-(d(i)-1)^2 * gradDx2 / d(i);
+    else
+        gradVx1 = gradVx1 + 10*(x1-x1t);
+        gradVx2 = gradVx2 + 10*(x2-x2t); 
+    end
 end
 
 % update control

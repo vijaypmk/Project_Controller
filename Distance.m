@@ -1,4 +1,4 @@
-function [d] = Distance(x,r1,r2,delta,doutside) 
+function [d] = Distance(x,r1,r2,num_obs,delta,doutside) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Matlab M-file                Author: Ricardo Sanfelice
 %
@@ -15,11 +15,13 @@ function [d] = Distance(x,r1,r2,delta,doutside)
 
 x1= x(1);
 x2= x(2);
+% global num_obs;
 
-
-if (x1-r1)^2+(x2-r2)^2> delta^2/8
-    d = sqrt((x1-r1)^2+(x2-r2)^2)-delta;
-else 
-    d = doutside;
+for i = 1:num_obs
+    if (x1-r1(i))^2+(x2-r2(i))^2> delta^2/8
+        d(i) = sqrt((x1-r1(i))^2+(x2-r2(i))^2)-delta;
+    else 
+        d(i) = doutside;
+    end
 end
     

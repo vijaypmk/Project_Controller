@@ -15,13 +15,15 @@
 mStep = 0.01;
 [a,b] = meshgrid(-1:mStep:axis_x,-axis_y:mStep:axis_y);
 [N,M] = size(a);
-for i=1:N,
-   for j=1:M,
-       v(i,j) = LyapunovFunction([a(i,j),b(i,j)],r1,r2,delta,doutside,voutside,x1t,x2t);
-   end
-end
+% for k = 1:2
+    for i=1:N,
+        for j=1:M,
+           v(i,j) = LyapunovFunction([a(i,j),b(i,j)],r1,r2,num_obs,delta,doutside,voutside,x1t,x2t);
+        end
+    end
+% end
 
-figure(1),clf
+% figure(1)
 [cs,h] = contour(a,b,v,20);
 % figure(2),clf
 % mesh(a,b,v);

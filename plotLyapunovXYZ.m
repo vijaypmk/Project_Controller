@@ -17,7 +17,7 @@ mStep = 0.01;
 [N,M] = size(a);
 for i=1:N,
    for j=1:M,
-       v(i,j) = LyapunovFunction([a(i,j),b(i,j)],r1,r2,delta,doutside,voutside,x1t,x2t);
+       v(i,j) = LyapunovFunction([a(i,j),b(i,j)],r1,r2,num_obs,delta,doutside,voutside,x1t,x2t);
    end
 end
 

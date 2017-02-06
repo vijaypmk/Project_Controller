@@ -12,17 +12,29 @@
 % Required files: -
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear all;
+close all;
 emax = 0.08;
 mu = 1.1;
 lambda = 0.09;
 
 % target position
 x1t = 3;
-x2t = 0;
+x2t = 0.1;
 
 % obstacle position
-r1 = 1;           
-r2 = 0;
+% for i = 1:2
+%     r1(i) = i-0.5;           
+%     r2(i) = 0;
+% end
+num_obs = 4;
+r1(1) = 1;
+r2(1) = 0;
+r1(2) = 1;
+r2(2) = 0.2;
+r1(3) = 1.5;
+r2(3) = 0.5;
+r1(4) = 1.5;
+r2(4) = -0.25;
 delta = 0.1;       % radius of obstacle
 
 doutside=0;
